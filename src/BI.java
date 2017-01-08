@@ -25,8 +25,8 @@ import com.google.common.collect.Maps;
 public class BI {
 	protected static final LocalDate minDay = LocalDate.of(2014, 01, 01);
 	protected static final LocalDate maxDay = LocalDate.of(2015, 12, 31);
-	protected static final int ZIEL_LAGERBESTAND = 140;
-	protected static final int MIN_LAGERBESTAND = 70;
+	protected static final int ZIEL_LAGERBESTAND = 140; // Bei Bestellung wird auf diese Anzahl aufgefüllt.
+	protected static final int MIN_LAGERBESTAND = 70; // Minimaler Lagerstand, bei Unterschreitung wird eine neue Bestellung ausgelöst.
 
 	protected XSSFWorkbook wb;
 	protected List<Integer> artikel = Lists.newArrayList();
@@ -60,7 +60,7 @@ public class BI {
 		// Füllen der Anfangsbestände
 		erstelleAnfangsbestaende();
 
-		passTheYear();
+		passTheTime();
 
 		//		erstelleLagerEingangAusgangTabelle(); wird durch Importscript in Qlik Sense übernommen
 
@@ -197,7 +197,7 @@ public class BI {
 
 	}
 
-	private void passTheYear() {
+	private void passTheTime() {
 		int ekId = 1;
 		int ekIndex = 0;
 		int vkIndex = 0;
@@ -296,7 +296,7 @@ public class BI {
 		CellStyle cellStyle = wb.createCellStyle();
 		CreationHelper createHelper = wb.getCreationHelper();
 		cellStyle.setDataFormat(createHelper.createDataFormat().getFormat("dd.mm.yyyy"));
-		Date ersterErster = Date.from(LocalDate.of(2014, 01, 01).atStartOfDay(ZoneId.systemDefault()).toInstant());
+		Date ersterErster = Date.from(minDay.atStartOfDay(ZoneId.systemDefault()).toInstant());
 		XSSFSheet sheet = wb.getSheet("Lager Anfangsbestaende");
 		int index = 0;
 		for (Lager lager : lagerListe) {
@@ -341,7 +341,7 @@ public class BI {
 			Lager lager = new Lager();
 			lagerListe.add(lager);
 			lager.vertriebsregionId = vertriebsregionId;
-			System.out.println("Erstelle lager für region " + vertriebsregionId);
+			System.out.println("Erstelle lager für Region " + vertriebsregionId);
 
 			// Haendler einfügen
 			XSSFSheet sheet = wb.getSheet("Haendler");
@@ -362,7 +362,7 @@ public class BI {
 				if (haendlerVertriebsregionId == vertriebsregionId) {
 					int id = (int) row.getCell(0).getNumericCellValue();
 					lager.haendlerIds.add(id);
-					System.out.println("Lager: " + vertriebsregionId + " fuege haendler " + id + " hinzu.");
+					System.out.println("Lager: " + vertriebsregionId + " fuege Haendler " + id + " hinzu.");
 				}
 			});
 		}
